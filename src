@@ -1,4 +1,5 @@
-DROP DATABASE
+DROP DATABASE IF EXISTS GerenciamentoEventos;
+
 CREATE DATABASE GerenciamentoEventos;
 
 USE GerenciamentoEventos;
@@ -7,7 +8,7 @@ CREATE TABLE Eventos (
     EventoID INT AUTO_INCREMENT PRIMARY KEY,
     NomeEvento VARCHAR(100) NOT NULL,
     DataEvento DATE NOT NULL,
-    LocalEvento VARCGAR(100) NOT NULL,
+    LocalEvento VARCHAR(100) NOT NULL,
     Descricao TEXT
 );
 
@@ -27,6 +28,8 @@ CREATE TABLE Inscricoes (
      FOREIGN KEY (ParticipanteID) REFERENCES Participantes(ParticipanteID)
 );
 
+     
+
 INSERT INTO Eventos (NomeEvento, DataEvento, LocalEvento, Descricao) VALUES
 ('Conferência de Tecnologia','2024-09-20','Centro de Convençôes','Uma conferência sobre as últimas tendẽncias em tecnologia.'),
 ('Workshop de Python','2024-10-05','Auditoria Principal','Workshop para iniciantes em Python.'),
@@ -35,14 +38,14 @@ INSERT INTO Eventos (NomeEvento, DataEvento, LocalEvento, Descricao) VALUES
 
 
 INSERT INTO Participantes (NomeParticipante, Email, Telefone) VALUES
-('Alice Moura','alice.moura@gmail.com','4888311468'),
-('Betina Santos','betina.snatos@gmail.com','4891775898),
-("Felipe Neto','felipe.neto@gmail.com','4890781458');
+('Alice Moura', 'alice.moura@gmail.com', '4888311468'),
+('Betina Santos', 'betina.santos@gmail.com', '4891775898'),
+('Felipe Neto', 'felipe.neto@gmail.com', '4890781458');
 
 INSERT INTO Inscricoes (EventoID, ParticipanteID, DataInscricao) VALUES
-(1,3,'2024-08-30'),
-(2,2,'2024-09-01),
-(3,1,'2024-09-03);
+(1, 3, '2024-08-30'),
+(2, 2, '2024-09-01'),
+(3, 1, '2024-09-03');
 
 SELECT * FROM Eventos;
 
@@ -61,42 +64,57 @@ SET LocalEvento = 'Auditório 2', DataEvento = '2024-09-12'
 WHERE EventoID = 1;
 
 UPDATE Participantes
-SET Telefone = '4888917758
-WHERE Participante = 2;
+SET Telefone = '4888917758'
+WHERE ParticipanteID = 2;
+
 
 DELETE FROM Inscricoes
 WHERE EventoID = 3 AND ParticipanteID = 1;
 
-SELECT p.NomeParticipante, p.Email, COUNT(i,EventoID) AS NumeroEventos
+SELECT p.NomeParticipante, p.Email, COUNT(i.EventoID) AS NumeroEventos
 FROM Participantes p
 JOIN Inscricoes i ON p.ParticipanteID = i.ParticipanteID 
 GROUP BY p.ParticipanteID 
-HAVING COUNT(id.EventoID) > 1;
+HAVING COUNT(i.EventoID) > 1;
+
 
 DELIMITER //
 
 CREATE PROCEDURE AdicionarEvento (
-     IN p_NomeEvento VARCHAR(100),
-     IN p_DataEvento DATE,
-     IN p_LocalEvento VARCHAR(100), 
-     IN p_Descricao TEXT
-);
-
+    IN p_NomeEvento VARCHAR(100),
+    IN p_DataEvento DATE,
+    IN p_LocalEvento VARCHAR(100),
+    IN p_Descricao TEXT
+)
 BEGIN
-    INSERT INTO Eventos(NomeEvento, dataEvento, LocalEvento, Descricao)
+    INSERT INTO Eventos(NomeEvento, DataEvento, LocalEvento, Descricao)
     VALUES (p_NomeEvento, p_DataEvento, p_LocalEvento, p_Descricao);
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE InscreverParticipantes (
+    IN p_EventoID INT,
+    IN p_ParticipanteID INT,
+    IN p_DataInscricao DATE
+)
+BEGIN
+    INSERT INTO Inscricoes (EventoID, ParticipanteID, DataInscricao)
+    VALUES (p_EventoID, p_ParticipanteID, p_DataInscricao);
 END //
 
 DELIMITER ;
 
 DELIMITER //
 
-CREATE PROCEDE AdicionarParticipante (
-     IN p_NomeParticipante VARCHAR(100),
-     IN p_Email VARCHAR(100),
-     IN p_Telefone VARCHAR(15)
-);
-
+CREATE PROCEDURE AdicionarParticipante (
+    IN p_NomeParticipante VARCHAR(100),
+    IN p_Email VARCHAR(100),
+    IN p_Telefone VARCHAR(15)
+)
 BEGIN
     INSERT INTO Participantes (NomeParticipante, Email, Telefone)
     VALUES (p_NomeParticipante, p_Email, p_Telefone);
@@ -104,26 +122,55 @@ END //
 
 DELIMITER ;
 
+
+-- Primeiro, exclua a procedure existente
+DROP PROCEDURE IF EXISTS InscreverParticipantes;
+
+-- Em seguida, crie a nova procedure
 DELIMITER //
 
-CREATE PROCEDE InscreverParticipantes (
-     IN p_EventoID INT,
-     IN p_ParticipanteID INT,
-     IN p_DataInscricao DATE
-);
-
+CREATE PROCEDURE InscreverParticipantes (
+    IN p_EventoID INT,
+    IN p_ParticipanteID INT,
+    IN p_DataInscricao DATE
+)
 BEGIN
     INSERT INTO Inscricoes (EventoID, ParticipanteID, DataInscricao)
-    VALUES (p_EventoID, p_ParticipanteID, p_DataInscricao):
+    VALUES (p_EventoID, p_ParticipanteID, p_DataInscricao);
 END //
 
 DELIMITER ;
 
+
+
+SET SQL_SAFE_UPDATES = 0;
+
 DELETE FROM Eventos
 WHERE DataEvento < CURDATE();
+
+SET SQL_SAFE_UPDATES = 1;
+
+
+
+-- Execute sua query aqui
+SET SQL_SAFE_UPDATES = 0;
+
+DELETE FROM Eventos
+WHERE DataEvento < CURDATE();
+
+SET SQL_SAFE_UPDATES = 1;
+
+-- Opcionalmente, reative o modo seguro globalmente
+SET GLOBAL SQL_SAFE_UPDATES = 1;
+
+
  
+SET SQL_SAFE_UPDATES = 0;
+
 DELETE FROM Inscricoes
 WHERE DataInscricao < '2024-01-01';
+
+SET SQL_SAFE_UPDATES = 1;
 
 SELECT i.InscricaoID, i.EventoID
 FROM Inscricoes i
