@@ -1,0 +1,59 @@
+# Sistema de Gerenciamento de Eventos
+
+Este projeto é um sistema de gerenciamento de eventos que inclui funcionalidades para criar e gerenciar eventos, participantes e inscrições. O sistema utiliza MySQL para a criação e manipulação do banco de dados.
+
+## Estrutura do Banco de Dados
+
+O banco de dados possui as seguintes tabelas:
+
+- **Eventos**: Armazena informações sobre eventos.
+- **Participantes**: Armazena informações sobre participantes.
+- **Inscricoes**: Armazena as inscrições dos participantes em eventos.
+
+### Tabelas
+
+1. **Eventos**
+   - `EventoID` (INT, AUTO_INCREMENT, PRIMARY KEY)
+   - `NomeEvento` (VARCHAR(100))
+   - `DataEvento` (DATE)
+   - `LocalEvento` (VARCHAR(100))
+   - `Descricao` (TEXT)
+
+2. **Participantes**
+   - `ParticipanteID` (INT, AUTO_INCREMENT, PRIMARY KEY)
+   - `NomeParticipante` (VARCHAR(100))
+   - `Email` (VARCHAR(100))
+   - `Telefone` (VARCHAR(15))
+
+3. **Inscricoes**
+   - `InscricaoID` (INT, AUTO_INCREMENT, PRIMARY KEY)
+   - `EventoID` (INT)
+   - `ParticipanteID` (INT)
+   - `DataInscricao` (DATE)
+   - FOREIGN KEY (`EventoID`) REFERENCES `Eventos(EventoID)` ON DELETE CASCADE
+   - FOREIGN KEY (`ParticipanteID`) REFERENCES `Participantes(ParticipanteID)`
+
+### Procedimentos Armazenados
+
+1. **AdicionarEvento**
+   - Adiciona um novo evento ao banco de dados.
+
+2. **InscreverParticipantes**
+   - Inscreve um participante em um evento.
+
+3. **AdicionarParticipante**
+   - Adiciona um novo participante ao banco de dados.
+
+### Executando o Script SQL
+
+1. **Conectar ao MySQL:**
+   Abra seu cliente MySQL e conecte-se ao servidor.
+
+2. **Executar o Script:**
+   Copie e cole o conteúdo do script SQL no seu cliente MySQL para criar o banco de dados, tabelas, e procedimentos armazenados, e inserir dados.
+
+3. **Desativar o Modo Seguro Temporariamente:**
+   Se necessário, desative o modo seguro para executar comandos DELETE:
+
+   ```sql
+   SET SQL_SAFE_UPDATES = 0;
